@@ -1,64 +1,77 @@
-# Smart Object Detection App (YOLOv8 + Falcon)
+# SSOD Detection App (YOLOv8 + Falcon)
 
 ## Overview
-This application uses YOLOv8 for object detection and integrates with Falcon for automatic model updates. The app allows users to upload images and get instant object classification and bounding box predictions.
+This application uses YOLOv8 for industrial safety object detection and integrates with Falcon for automatic model updates. The app allows users to upload images and detect 7 specific industrial safety objects:
+- OxygenTank
+- NitrogenTank
+- FirstAidBox
+- FireAlarm
+- SafetySwitchPanel
+- EmergencyPhone
+- FireExtinguisher
 
 ## Features
 - Real-time object detection using YOLOv8
 - Automatic model updates via Falcon integration
 - Cross-platform compatibility
 - Streamlit-based web interface
-
-## Architecture
-```mermaid
-graph TD
-    A[User] --> B[Streamlit UI]
-    B --> C[YOLOv8 Model]
-    C --> D[Falcon API]
-    D --> E[New Model Weights]
-    E --> F[Auto-Update Logic]
-    F --> C
-```
+- Docker support for easy deployment
 
 ## Installation
 
-1. Install required packages:
+1. Clone the repository:
    ```
-   pip install ultralytics streamlit pillow requests torch
+   git clone <repository-url>
+   cd ssod-detection-app
    ```
 
-2. Verify installation:
+2. Install required packages:
    ```
-   python -c "import ultralytics; print(ultralytics.__version__)"
+   pip install -r requirements.txt
    ```
 
 ## Usage
 
 Run the application:
 ```
-streamlit run app.py
+streamlit run app.py --server.port=8080 --server.address=0.0.0.0
 ```
 
-The app will be available at http://localhost:8501
+The app will be available at http://localhost:8080
 
-## How It Works
+## Deployment
 
-1. **App Functionality**: The YOLOv8 Smart Detection App allows users to upload images and get instant object classification and bounding box predictions. It's lightweight, cross-platform, and runs seamlessly on both macOS and browsers.
+### Option 1: Direct Deployment
+```
+python3 -m pip install -r requirements.txt
+streamlit run app.py --server.port=8080 --server.address=0.0.0.0
+```
 
-2. **Model Maintenance with Falcon**: The app connects to Falcon to check for newer retrained versions of the YOLO model. If Falcon detects performance drift, it automatically fine-tunes and uploads an updated model. The app then fetches the updated weights, ensuring continuous improvement without manual intervention.
+### Option 2: Using the Deployment Script
+```
+chmod +x start_app.sh
+./start_app.sh
+```
+
+### Option 3: Docker Deployment
+```
+docker build -t ssod-detection-app .
+docker run -p 8080:8080 ssod-detection-app
+```
 
 ## Directory Structure
 ```
 ssod_detection_app/
 ├── app.py
 ├── requirements.txt
+├── Dockerfile
+├── start_app.sh
 ├── runs/
 │   └── detect/exp_m4_train1/weights/best.pt
 ├── configs/
 │   └── data.yaml
-├── utils/
-│   └── falcon_update.py
-└── sample_images/
+└── utils/
+    └── falcon_update.py
 ```
 
 ## Model Performance
