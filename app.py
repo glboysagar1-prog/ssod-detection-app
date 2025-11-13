@@ -34,8 +34,8 @@ def download_model():
     
     if not model_path.exists():
         with st.spinner("⏳ Downloading model weights from Google Drive... This may take a minute!"):
-            # Replace YOUR_FILE_ID with your actual Google Drive file ID
-            file_id = "YOUR_FILE_ID"
+            # Using the provided Google Drive file ID
+            file_id = "1Wk1cHp2eR6oiVdZd4CJu-ZFHc-HybHgS"
             url = f'https://drive.google.com/uc?id={file_id}'
             
             try:
