@@ -79,12 +79,18 @@ def load_yolo_model():
 # Function to convert BGR to RGB (fallback if cv2 not available)
 def bgr_to_rgb(image_array):
     """Convert BGR to RGB with fallback for environments without OpenCV"""
-    if CV2_AVAILABLE and len(image_array.shape) == 3 and image_array.shape[2] == 3:
+    # Always use manual conversion to avoid OpenCV dependency
+    if len(image_array.shape) == 3 and image_array.shape[2] == 3:
         return image_array[:, :, ::-1]  # Reverse the last dimension to convert BGR to RGB
     return image_array
 
 # Load the model when the app starts
-model = load_yolo_model()
+try:
+    model = load_yolo_model()
+except Exception as e:
+    st.error(f"Error initializing model: {e}")
+    st.info("ℹ️ The application will run in demo mode without object detection")
+    model = None
 
 st.set_page_config(page_title="YOLOv8 Object Detection", layout="wide")
 
@@ -184,6 +190,7 @@ if uploaded_file:
                 
         except Exception as e:
             st.error(f"Error during detection: {str(e)}")
+            st.info("ℹ️ The application will continue to run in demo mode")
             st.write("This might happen if the image format is not supported or if there's an issue with the model.")
 
     # Clean up the temporary file
