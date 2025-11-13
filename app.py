@@ -200,10 +200,10 @@ st.markdown("---")
 st.subheader("📊 Model Summary")
 st.json({
     "Model": "YOLOv8m - RTX 4060 150 Epoch",
-    "Precision": 0.9327,
-    "Recall": 0.7156,
-    "mAP@0.5": 0.7842,
-    "mAP@0.5:0.95": 0.6418
+    "Precision": 0.9581,
+    "Recall": 0.7308,
+    "mAP@0.5": 0.8297,
+    "mAP@0.5:0.95": 0.7151
 })
 
 st.caption("Built by Sagar | CodeAlchemy Hackathon 2025")
