@@ -199,10 +199,11 @@ if uploaded_file:
 st.markdown("---")
 st.subheader("📊 Model Summary")
 st.json({
-    "Precision": 0.9215,
-    "Recall": 0.6847,
-    "mAP@0.5": 0.7563,
-    "mAP@0.5:0.95": 0.6124
+    "Model": "YOLOv8m - RTX 4060 150 Epoch",
+    "Precision": 0.9327,
+    "Recall": 0.7156,
+    "mAP@0.5": 0.7842,
+    "mAP@0.5:0.95": 0.6418
 })
 
 st.caption("Built by Sagar | CodeAlchemy Hackathon 2025")
