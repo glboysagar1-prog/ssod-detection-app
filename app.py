@@ -1,7 +1,9 @@
 import streamlit as st
-from PIL import Image
 import tempfile, os
 import numpy as np
+from PIL import Image
+import gdown  # type: ignore
+from pathlib import Path
 
 # Try to import cv2, but provide fallback if not available
 try:
@@ -22,60 +24,47 @@ except ImportError:
 # Global variable to store the model
 model = None
 
-# Function to safely import and load the model
-def load_model_safely():
-    """Safely load the YOLO model with error handling"""
-    global model
-    try:
-        # Import YOLO only when needed
-        from ultralytics import YOLO  # type: ignore
-        
-        # Try to use the model locator for automatic detection
-        try:
-            from model_locator import load_model
-            model = load_model()
-            st.success("✅ Model loaded successfully using automatic detection")
-            return model
-        except FileNotFoundError as e:
-            st.error(f"Model file not found: {e}")
-            st.info("ℹ️ The application will run in demo mode without object detection")
-            return None
-        except Exception as e:
-            st.warning(f"Automatic model detection failed: {e}")
-            # Fallback to fixed path with update checking
-            default_model_path = "runs/detect/exp_rtx4060_150epoch/weights/best.pt"
-            if not os.path.exists(default_model_path):
-                st.error(f"Default model file not found at: {default_model_path}")
-                st.info("ℹ️ The application will run in demo mode without object detection")
-                return None
+@st.cache_resource
+def download_model():
+    """Download model from Google Drive if not exists"""
+    save_dest = Path('models')
+    save_dest.mkdir(exist_ok=True)
+    
+    model_path = save_dest / "best.pt"
+    
+    if not model_path.exists():
+        with st.spinner("⏳ Downloading model weights from Google Drive... This may take a minute!"):
+            # Replace YOUR_FILE_ID with your actual Google Drive file ID
+            file_id = "YOUR_FILE_ID"
+            url = f'https://drive.google.com/uc?id={file_id}'
+            
             try:
-                # Import the update function only when needed
-                from utils.falcon_update import check_falcon_update
-                # Check for updates from Falcon
-                updated_model_path = check_falcon_update(default_model_path)
-                model = YOLO(updated_model_path)
-                if updated_model_path != default_model_path:
-                    st.success("✅ Model updated automatically from Falcon retraining!")
-                else:
-                    st.info("ℹ️ Using the latest available model")
-                return model
-            except Exception as e2:
-                st.error(f"Failed to load model: {e2}")
-                # Final fallback - try to load the default model directly
-                try:
-                    model = YOLO(default_model_path)
-                    st.info("ℹ️ Using default model path")
-                    return model
-                except Exception as e3:
-                    st.error(f"Critical error: Could not load any model. {e3}")
-                    st.info("ℹ️ The application will run in demo mode without object detection")
-                    return None
+                gdown.download(url, str(model_path), quiet=False)
+                st.success("✅ Model downloaded successfully!")
+            except Exception as e:
+                st.error(f"❌ Error downloading model: {e}")
+                return None
+    
+    return model_path
+
+def load_yolo_model():
+    """Load YOLO model with deferred import"""
+    try:
+        from ultralytics import YOLO  # type: ignore
+         
+        model_path = download_model()
+        if model_path and model_path.exists():
+            model = YOLO(str(model_path))
+            return model
+        else:
+            st.error("Model file not found. Please check your Google Drive link.")
+            return None
     except ImportError as e:
         st.error(f"Failed to import YOLO: {e}")
         st.info("ℹ️ The application will run in demo mode without object detection")
         return None
     except Exception as e:
-        st.error(f"Unexpected error loading model: {e}")
+        st.error(f"Error loading model: {e}")
         st.info("ℹ️ The application will run in demo mode without object detection")
         return None
 
@@ -86,7 +75,7 @@ def bgr_to_rgb(image_array):
     return image_array
 
 # Load the model when the app starts
-model = load_model_safely()
+model = load_yolo_model()
 
 st.set_page_config(page_title="YOLOv8 Object Detection", layout="wide")
 

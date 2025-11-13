@@ -1,8 +1,7 @@
-ultralytics
 streamlit
-pillow
-requests
-torch
-torchvision
+ultralytics
 opencv-python-headless
+pillow
 numpy
+torch
+gdown
