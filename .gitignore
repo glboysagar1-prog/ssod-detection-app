@@ -144,3 +144,4 @@ test_result*
 # Debug app
 debug_app.py
 *.zip
+runs/detect/*/weights/*.pt
