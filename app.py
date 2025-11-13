@@ -48,14 +48,22 @@ def download_model():
     return model_path
 
 def load_yolo_model():
-    """Load YOLO model with deferred import"""
+    """Load YOLO model with deferred import and comprehensive error handling"""
+    global model
     try:
+        # Import YOLO only when needed to avoid issues in cloud environments
         from ultralytics import YOLO  # type: ignore
          
         model_path = download_model()
         if model_path and model_path.exists():
-            model = YOLO(str(model_path))
-            return model
+            try:
+                model = YOLO(str(model_path))
+                st.success("✅ Model loaded successfully!")
+                return model
+            except Exception as e:
+                st.error(f"❌ Error loading model: {e}")
+                st.info("ℹ️ The application will run in demo mode without object detection")
+                return None
         else:
             st.error("Model file not found. Please check your Google Drive link.")
             return None
@@ -64,12 +72,13 @@ def load_yolo_model():
         st.info("ℹ️ The application will run in demo mode without object detection")
         return None
     except Exception as e:
-        st.error(f"Error loading model: {e}")
+        st.error(f"Unexpected error loading model: {e}")
         st.info("ℹ️ The application will run in demo mode without object detection")
         return None
 
 # Function to convert BGR to RGB (fallback if cv2 not available)
 def bgr_to_rgb(image_array):
+    """Convert BGR to RGB with fallback for environments without OpenCV"""
     if CV2_AVAILABLE and len(image_array.shape) == 3 and image_array.shape[2] == 3:
         return image_array[:, :, ::-1]  # Reverse the last dimension to convert BGR to RGB
     return image_array
