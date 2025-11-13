@@ -145,3 +145,4 @@ test_result*
 debug_app.py
 *.zip
 runs/detect/*/weights/*.pt
+ssod-deployment/runs/detect/*/weights/*.pt
